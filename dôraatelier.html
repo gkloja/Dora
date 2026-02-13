@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dôra Atelier · encontro com o couro</title>
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Josefin+Sans:wght@200;300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #f5efe8;
+      color: #2c2823;
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.4;
+    }
+
+    /* scroll suave e elegante */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* header com logo — tela inteira, entrada suave */
+    .hero {
+      min-height: 70vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 40px 20px 20px;
+      position: relative;
+      background: radial-gradient(circle at 30% 30%, #fffaf3 0%, #ede3d8 100%);
+      border-bottom: 1px solid rgba(150, 120, 100, 0.15);
+    }
+
+    .logo-container {
+      margin-bottom: 30px;
+      animation: floatLogo 3s infinite alternate ease-in-out;
+    }
+
+    @keyframes floatLogo {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(-8px); }
+    }
+
+    .logo-img {
+      max-width: 280px;
+      width: 80%;
+      height: auto;
+      filter: drop-shadow(0 15px 20px rgba(80, 55, 40, 0.15));
+      border-radius: 30px 30px 120px 120px;
+      transition: all 0.3s;
+    }
+
+    .logo-fallback {
+      display: none;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 5rem;
+      letter-spacing: 6px;
+      color: #4f3f33;
+      border-bottom: 3px double #c1a186;
+      padding-bottom: 10px;
+    }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #8f735b;
+      margin-top: 20px;
+      font-weight: 200;
+      word-spacing: 8px;
+    }
+
+    .hero-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      font-style: italic;
+      color: #5f4a3a;
+      margin-top: 25px;
+      border-top: 1px solid #dccfc4;
+      padding-top: 30px;
+      max-width: 600px;
+      opacity: 0.8;
+    }
+
+    /* galeria como vitrine *sem textos individuais* — só imagem pura */
+    .vitrine {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin: 80px 0;
+    }
+
+    .peca {
+      position: relative;
+      border-radius: 40px 40px 30px 30px;
+      overflow: hidden;
+      background-color: #e5d6c8;
+      box-shadow: 0 20px 35px -10px rgba(70, 50, 40, 0.2);
+      transition: all 0.4s cubic-bezier(0.2, 0.9, 0.3, 1);
+      cursor: pointer;
+      aspect-ratio: 1 / 1.1;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .peca:hover {
+      transform: scale(1.02) translateY(-8px);
+      box-shadow: 0 30px 45px -8px #543f30;
+    }
+
+    /* cada peça contém as imagens em camadas (para efeito de dupla/tripla) */
+    .peca-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .peca-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transition: opacity 0.7s ease, transform 0.5s;
+      opacity: 0;
+      border-radius: 0;
+    }
+
+    .peca-img.primary {
+      opacity: 1;
+      position: relative;
+    }
+
+    /* efeito artístico: sobreposição suave */
+    .peca:hover .peca-img.primary {
+      opacity: 0.85;
+    }
+    .peca:hover .peca-img.secondary {
+      opacity: 0.4;
+      transform: scale(1.03);
+    }
+    .peca .peca-img.secondary {
+      opacity: 0;
+    }
+    .peca:hover .peca-img.tertiary {
+      opacity: 0.25;
+      transform: scale(1.05);
+    }
+
+    /* pluralidade: selo discreto de multiplas imagens */
+    .multi-badge {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(255, 245, 235, 0.7);
+      backdrop-filter: blur(8px);
+      padding: 8px 15px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      color: #3f2e21;
+      border: 1px solid #ffffffb3;
+      z-index: 20;
+      font-weight: 300;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      pointer-events: none;
+      transition: 0.2s;
+    }
+
+    .multi-badge i {
+      margin-right: 6px;
+      color: #8c6f56;
+    }
+
+    .peca:hover .multi-badge {
+      background: #fffcf9;
+      box-shadow: 0 4px 15px rgba(90, 60, 40, 0.15);
+    }
+
+    /* sobreposição de interesse (hover reveal) */
+    .interesse-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: linear-gradient(to top, rgba(30,20,12,0.7) 0%, transparent 100%);
+      padding: 40px 20px 20px;
+      display: flex;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(15px);
+      transition: 0.3s 0.1s;
+      pointer-events: none;
+    }
+
+    .peca:hover .interesse-overlay {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .btn-quero {
+      background: #ffffffd6;
+      backdrop-filter: blur(8px);
+      border: none;
+      border-radius: 60px;
+      padding: 16px 30px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-weight: 400;
+      font-size: 1.1rem;
+      color: #2c241e;
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1px solid #ffffff;
+      box-shadow: 0 8px 18px -4px #1e160f;
+      letter-spacing: 1.5px;
+    }
+
+    .btn-quero i {
+      color: #25D366;
+      font-size: 1.6rem;
+    }
+
+    .btn-quero:hover {
+      background: #25D366;
+      color: white;
+      border-color: #25D366;
+    }
+    .btn-quero:hover i {
+      color: white;
+    }
+
+    /* modal de preview refinado (ao clicar na imagem) */
+    .modal-preview {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(18, 14, 12, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+    }
+
+    .modal-conteudo {
+      background: #fcf7f1;
+      max-width: 1000px;
+      width: 90%;
+      border-radius: 60px 60px 40px 40px;
+      padding: 30px 30px 40px;
+      box-shadow: 0 40px 70px #1e160eb0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 2px solid #f0daca;
+    }
+
+    .modal-carrossel {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .modal-img-principal {
+      width: 100%;
+      max-height: 55vh;
+      object-fit: contain;
+      border-radius: 40px;
+      background: #ddd0c2;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+    }
+
+    .modal-thumbs {
+      display: flex;
+      gap: 15px;
+      margin: 25px 0 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .thumb {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      object-fit: cover;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: 0.2s;
+      background: #cbb9a8;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+    }
+
+    .thumb.ativa {
+      border-color: #b28c6f;
+      transform: scale(1.05);
+    }
+
+    .modal-whatsapp-btn {
+      background: #25D366;
+      border: none;
+      border-radius: 50px;
+      padding: 18px 45px;
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 400;
+      display: inline-flex;
+      align-items: center;
+      gap: 15px;
+      margin-top: 10px;
+      cursor: pointer;
+      border: 2px solid #fff3e5;
+      box-shadow: 0 10px 25px #128C7E55;
+      transition: all 0.2s;
+      font-family: 'Josefin Sans', sans-serif;
+      letter-spacing: 1.5px;
+    }
+
+    .modal-whatsapp-btn i {
+      font-size: 2rem;
+    }
+
+    .modal-whatsapp-btn:hover {
+      background: #1ebf5c;
+      transform: scale(1.02);
+    }
+
+    .fechar-modal {
+      align-self: flex-end;
+      background: none;
+      border: none;
+      font-size: 2.8rem;
+      cursor: pointer;
+      color: #8a6f5a;
+      margin-bottom: 10px;
+      padding: 0 15px;
+      transition: 0.2s;
+    }
+    .fechar-modal:hover {
+      color: #3e2c1e;
+      transform: rotate(90deg);
+    }
+
+    /* rodapé e selo */
+    footer {
+      margin-top: 90px;
+      padding: 40px 20px;
+      text-align: center;
+      color: #a48d7a;
+      border-top: 1px solid #e4d4c4;
+      font-size: 0.9rem;
+      letter-spacing: 2px;
+    }
+
+    .whatsapp-float {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      z-index: 500;
+    }
+
+    .whatsapp-float a {
+      background: #25D366;
+      color: white;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      box-shadow: 0 12px 30px #1c8549;
+      transition: 0.2s;
+      border: 4px solid #faf0e6;
+    }
+    .whatsapp-float a:hover {
+      transform: scale(1.1) rotate(5deg);
+      background: #20b859;
+    }
+  </style>
+</head>
+<body>
+
+<!-- MODAL DE VISUALIZAÇÃO (aparece ao clicar em qualquer bolsa) -->
+<div class="modal-preview" id="modalPreview">
+  <div class="modal-conteudo">
+    <button class="fechar-modal" id="fecharModal">&times;</button>
+    <div class="modal-carrossel">
+      <img class="modal-img-principal" id="modalImgPrincipal" src="" alt="bolsa em foco">
+      <div class="modal-thumbs" id="modalThumbs"></div>
+      <button class="modal-whatsapp-btn" id="enviarWhatsAppModal">
+        <i class="fab fa-whatsapp"></i> LEVAR ESTA BOLSA
+      </button>
+    </div>
+  </div>
+</div>
+
+<main class="container">
+  <!-- HERO + LOGO -->
+  <section class="hero">
+    <div class="logo-container">
+      <!-- LOGO REAL (troque o src) -->
+      <img src="logo-dora.png" alt="Dôra Atelier" class="logo-img" onerror="this.style.display='none'; document.querySelector('.logo-fallback').style.display='block';">
+      <div class="logo-fallback">DÔRA <br><span style="font-size:2rem;">atelier</span></div>
+    </div>
+    <div class="hero-sub">couro · palha · silêncio</div>
+    <div class="hero-quote">“cada bolsa carrega um gesto”</div>
+  </section>
+
+  <!-- VITRINE PURA: só fotos, sem nomes. múltiplas imagens sobrepostas com efeito -->
+  <div class="vitrine" id="vitrine">
+    <!-- Bolsa 1 - duas imagens (exemplo) -->
+    <div class="peca" data-imagens='["https://images.unsplash.com/photo-1584917865446-5c22e9c1a7b6?w=600&auto=format", "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600&auto=format"]'>
+      <div class="peca-inner">
+        <img src="https://images.unsplash.com/photo-1584917865446-5c22e9c1a7b6?w=600&auto=format" class="peca-img primary" alt="bolsa">
+        <img src="https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600&auto=format" class="peca-img secondary" alt="bolsa detalhe">
+        <div class="multi-badge"><i class="far fa-images"></i> 2 ângulos</div>
+      </div>
+      <div class="interesse-overlay">
+        <button class="btn-quero" data-bolsa-index="0"><i class="fab fa-whatsapp"></i> QUERO ESTA</button>
+      </div>
+    </div>
+
+    <!-- Bolsa 2 - três imagens -->
+    <div class="peca" data-imagens='["https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&auto=format", "https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=600&auto=format", "https://images.unsplash.com/photo-1622560480605-d6c1c4c3b4d8?w=600&auto=format"]'>
+      <div class="peca-inner">
+        <img src="https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&auto=format" class="peca-img primary" alt="bolsa">
+        <img src="https://images.unsplash.com/photo-1564257631407-4deb1f99d992?w=600&auto=format" class="peca-img secondary" alt="bolsa lado">
+        <img src="https://images.unsplash.com/photo-1622560480605-d6c1c4c3b4d8?w=600&auto=format" class="peca-img tertiary" alt="detalhe">
+        <div class="multi-badge"><i class="far fa-images"></i> 3 fotos</div>
+      </div>
+      <div class="interesse-overlay">
+        <button class="btn-quero" data-bolsa-index="1"><i class="fab fa-whatsapp"></i> QUERO ESTA</button>
+      </div>
+    </div>
+
+    <!-- Bolsa 3 - duas imagens -->
+    <div class="peca" data-imagens='["https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&auto=format", "https://images.unsplash.com/photo-1584345604479-8ec5e12e6dd4?w=600&auto=format"]'>
+      <div class="peca-inner">
+        <img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&auto=format" class="peca-img primary" alt="tiracolo">
+        <img src="https://images.unsplash.com/photo-1584345604479-8ec5e12e6dd4?w=600&auto=format" class="peca-img secondary" alt="tiracolo uso">
+        <div class="multi-badge"><i class="far fa-images"></i> 2 fotos</div>
+      </div>
+      <div class="interesse-overlay">
+        <button class="btn-quero" data-bolsa-index="2"><i class="fab fa-whatsapp"></i> QUERO ESTA</button>
+      </div>
+    </div>
+
+    <!-- Bolsa 4 - quatro imagens (riqueza) -->
+    <div class="peca" data-imagens='["https://images.unsplash.com/photo-1591561954555-607968c989ab?w=600&auto=format", "https://images.unsplash.com/photo-1614179679570-ec1f2c1c0e73?w=600&auto=format", "https://images.unsplash.com/photo-1608532153645-8c6c9a4fa1b5?w=600&auto=format", "https://images.unsplash.com/photo-1611444792829-2a6f1eb4e90c?w=600&auto=format"]'>
+      <div class="peca-inner">
+        <img src="https://images.unsplash.com/photo-1591561954555-607968c989ab?w=600&auto=format" class="peca-img primary" alt="cesta">
+        <img src="https://images.unsplash.com/photo-1614179679570-ec1f2c1c0e73?w=600&auto=format" class="peca-img secondary" alt="costa">
+        <img src="https://images.unsplash.com/photo-1608532153645-8c6c9a4fa1b5?w=600&auto=format" class="peca-img tertiary" alt="detalhe">
+        <img src="https://images.unsplash.com/photo-1611444792829-2a6f1eb4e90c?w=600&auto=format" class="peca-img" style="opacity:0;" alt=""> <!-- quarta imagem extra -->
+        <div class="multi-badge"><i class="far fa-images"></i> 4 fotos</div>
+      </div>
+      <div class="interesse-overlay">
+        <button class="btn-quero" data-bolsa-index="3"><i class="fab fa-whatsapp"></i> QUERO ESTA</button>
+      </div>
+    </div>
+
+    <!-- Bolsa 5 - imagem única (sem badge) -->
+    <div class="peca" data-imagens='["https://images.unsplash.com/photo-1606761568499-6d2451b23c66?w=600&auto=format"]'>
+      <div class="peca-inner">
+        <img src="https://images.unsplash.com/photo-1606761568499-6d2451b23c66?w=600&auto=format" class="peca-img primary" alt="mochila">
+        <!-- sem badge -->
+      </div>
+      <div class="interesse-overlay">
+        <button class="btn-quero" data-bolsa-index="4"><i class="fab fa-whatsapp"></i> QUERO ESTA</button>
+      </div>
+    </div>
+
+    <!-- Bolsa 6 - duas fotos -->
+    <div class="peca" data-imagens='["https://images.unsplash.com/photo-1594223274512-ad4803739b7c?w=600&auto=format", "https://images.unsplash.com/photo-1605464315542-b5d59d4434bc?w=600&auto=format"]'>
+      <div class="peca-inner">
+        <img src="https://images.unsplash.com/photo-1594223274512-ad4803739b7c?w=600&auto=format" class="peca-img primary" alt="pochete">
+        <img src="https://images.unsplash.com/photo-1605464315542-b5d59d4434bc?w=600&auto=format" class="peca-img secondary" alt="pochete lado">
+        <div class="multi-badge"><i class="far fa-images"></i> 2 fotos</div>
+      </div>
+      <div class="interesse-overlay">
+        <button class="btn-quero" data-bolsa-index="5"><i class="fab fa-whatsapp"></i> QUERO ESTA</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- rodapé delicado -->
+  <footer>
+    <p>toque · textura · Dôra Atelier</p>
+    <p style="margin-top: 20px; font-size: 0.8rem;">+55 92 9205-5895  |  Manaus/AM</p>
+  </footer>
+</main>
+
+<!-- whatsapp fixo da Dôra (contato geral) -->
+<div class="whatsapp-float">
+  <a href="https://wa.me/559292055895?text=Olá%20Dôra!%20Chego%20através%20do%20site%20e%20quero%20sentir%20suas%20bolsas." target="_blank"><i class="fab fa-whatsapp"></i></a>
+</div>
+
+<script>
+  (function() {
+    // dados das bolsas a partir dos atributos data-imagens
+    const pecas = document.querySelectorAll('.peca');
+    const modal = document.getElementById('modalPreview');
+    const modalImg = document.getElementById('modalImgPrincipal');
+    const modalThumbs = document.getElementById('modalThumbs');
+    const fecharModal = document.getElementById('fecharModal');
+    const btnEnviarModal = document.getElementById('enviarWhatsAppModal');
+
+    let imagensAtuais = [];
+    let indexAtual = 0;
+
+    // atualiza modal com as imagens da bolsa clicada
+    function abrirModal(imagens, indexClique = 0) {
+      imagensAtuais = imagens;
+      indexAtual = indexClique;
+
+      // imagem principal
+      modalImg.src = imagensAtuais[indexAtual];
+
+      // thumbnails
+      modalThumbs.innerHTML = '';
+      imagensAtuais.forEach((imgSrc, idx) => {
+        const thumb = document.createElement('img');
+        thumb.src = imgSrc;
+        thumb.classList.add('thumb');
+        if (idx === indexAtual) thumb.classList.add('ativa');
+        thumb.addEventListener('click', () => {
+          indexAtual = idx;
+          modalImg.src = imagensAtuais[indexAtual];
+          document.querySelectorAll('.thumb').forEach(t => t.classList.remove('ativa'));
+          thumb.classList.add('ativa');
+        });
+        modalThumbs.appendChild(thumb);
+      });
+
+      modal.style.display = 'flex';
+    }
+
+    // anexar evento de clique em toda a peça (para abrir modal)
+    pecas.forEach((peca, idx) => {
+      const imagensStr = peca.dataset.imagens;
+      if (imagensStr) {
+        const imagens = JSON.parse(imagensStr);
+        // clique em qualquer lugar da peça (exceto botão) -> modal
+        peca.addEventListener('click', (e) => {
+          // se clicou no botão ou dentro do overlay, não abrimos modal (botão tem tratamento próprio)
+          if (e.target.closest('.btn-quero') || e.target.closest('.interesse-overlay')) return;
+          abrirModal(imagens, 0);
+        });
+      }
+    });
+
+    // botões "QUERO ESTA" - abrir whatsapp com a imagem principal da bolsa
+    document.querySelectorAll('.btn-quero').forEach((btn, i) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation(); // evitar abertura do modal
+        // descobrir índice da bolsa (pode vir do data-bolsa-index)
+        const bolsaIndex = btn.getAttribute('data-bolsa-index');
+        if (bolsaIndex === null) return;
+        const peca = pecas[bolsaIndex];
+        if (!peca) return;
+        const imagens = JSON.parse(peca.dataset.imagens);
+        if (!imagens.length) return;
+
+        // pega a primeira imagem (ou podemos mandar a que está visível? a primeira)
+        const fotoUrl = imagens[0]; // url da primeira foto
+
+        // Prepara mensagem personalizada com a imagem (URL encurtada simbolicamente)
+        const mensagem = `Olá Dôra! ✨ Me encantei por esta bolsa no seu ateliê. Poderia me contar mais sobre ela? ${fotoUrl}`;
+        const link = `https://wa.me/559292055895?text=${encodeURIComponent(mensagem)}`;
+        window.open(link, '_blank');
+      });
+    });
+
+    // botão do modal "LEVAR ESTA BOLSA"
+    btnEnviarModal.addEventListener('click', () => {
+      if (imagensAtuais.length > 0) {
+        const fotoAtual = imagensAtuais[indexAtual]; // foto que está sendo vista
+        const mensagem = `Olá Dôra! ✨ Olha só esta bolsa que me chamou atenção no site: ${fotoAtual}  Gostaria de mais fotos e informações.`;
+        const link = `https://wa.me/559292055895?text=${encodeURIComponent(mensagem)}`;
+        window.open(link, '_blank');
+      }
+    });
+
+    // fechar modal
+    fecharModal.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+    window.addEventListener('click', (e) => {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+
+  })();
+</script>
+
+<!-- substitua as imagens de exemplo (Unsplash) pelas fotos reais das bolsas da Dôra -->
+<!-- a logo deverá ser colocada na raiz como logo-dora.png (ou alterar caminho) -->
+
+</body>
+</html> 
