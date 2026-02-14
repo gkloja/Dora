@@ -798,7 +798,7 @@
 
   <script>
     // ===== PLAYER DE RÁDIO =====
-    const radioUrl = "http://1.stmip.net:8010/;stream.mp3";
+    const radioUrl = "http://streaming13.hstbr.net:8280/live";
     const radioPlayer = new Audio(radioUrl);
     radioPlayer.preload = 'none';
     
@@ -971,7 +971,7 @@
     // Função para reservar no WhatsApp
     window.reservarWhatsApp = function() {
       if (fotoAtual) {
-        const msg = `Olá Dôra! Me interessei por esta peça (${fotoAtual}) da sua coleção. Gostaria de mais informações.`;
+        const msg = `Olá Dôra! Me interessei por esta peça (https://atelierdora.onrender.com/${fotoAtual}) da sua coleção. Gostaria de mais informações.`;
         window.open(`https://wa.me/559292055895?text=${encodeURIComponent(msg)}`, '_blank');
       }
     };
