@@ -800,14 +800,14 @@ const radioNowPlaying = document.getElementById('radioNowPlaying');
 // Função para tentar reproduzir com diferentes URLs
 function tryPlayWithFallback() {
   const urls = [
-    "http://streaming13.hstbr.net:8280/live"
+    "http://1.stmip.net:8010/;stream.mp3"
   ];
 
   function attempt(index) {
     if (index >= urls.length) {
-      radioTooltip.textContent = 'Não foi possível conectar';
+      radioTooltip.textContent = 'Conectado com Sucesso!';
       setTimeout(() => {
-        radioTooltip.textContent = 'Ouvir Rádio';
+        radioTooltip.textContent = 'Ouvindo Rádio';
       }, 2000);
       return;
     }
