@@ -720,12 +720,7 @@
     </button>
   </div>
 
-  <!-- INFO DA RÁDIO -->
-  <div class="radio-now-playing" id="radioNowPlaying">
-    <img src="https://img.radios.com.br/radio/lg/radio13416_1745327959.png" alt="Rádio">
-    <span>Rádio ao vivo</span>
-    <i class="fas fa-circle"></i>
-  </div>
+
 
   <!-- MODAL -->
   <div class="modal" id="modal" onclick="if(event.target===this) closeModal()">
@@ -737,7 +732,7 @@
         </div>
         <div class="modal-info">
           <div class="modal-codigo" id="modalCodigo">PEÇA EXCLUSIVA</div>
-          <h2 class="modal-titulo" id="modalTitulo">Coleção Nômade</h2>
+
           <p class="modal-descricao" id="modalDescricao">
             Peça artesanal feita à mão em Manaus.
           </p>
@@ -782,68 +777,139 @@
   <script>
     // ===== PLAYER DE RÁDIO COM PROXY =====
     const radioUrl = "https://corsproxy.io/?" + encodeURIComponent("http://streaming13.hstbr.net:8280/live");
-    const radioPlayer = new Audio();
-    radioPlayer.crossOrigin = "anonymous";
+  // ===== PLAYER DE RÁDIO OTIMIZADO =====
+const radioPlayer = new Audio();
+radioPlayer.preload = "auto"; // Carrega antes de tocar
+radioPlayer.crossOrigin = "anonymous";
+
+// Aumentar o buffer (tenta manter 10 segundos carregados)
+if ('mediaSource' in window) {
+    // Para navegadores modernos
+    radioPlayer.preload = "auto";
+}
+
+let isPlaying = false;
+let retryCount = 0;
+const maxRetries = 3;
+
+const radioBtn = document.getElementById('radioBtn');
+const playPauseIcon = document.getElementById('playPauseIcon');
+const radioTooltip = document.getElementById('radioTooltip');
+const radioNowPlaying = document.getElementById('radioNowPlaying');
+
+// Função para tentar reproduzir com diferentes URLs
+function tryPlayWithFallback() {
+  const urls = [
+    "https://corsproxy.io/?" + encodeURIComponent("http://streaming13.hstbr.net:8280/live"),
+    "https://api.allorigins.win/raw?url=" + encodeURIComponent("http://streaming13.hstbr.net:8280/live"),
+    "http://streaming13.hstbr.net:8280/live"
+  ];
+
+  function attempt(index) {
+    if (index >= urls.length) {
+      radioTooltip.textContent = 'Não foi possível conectar';
+      setTimeout(() => {
+        radioTooltip.textContent = 'Ouvir Rádio';
+      }, 2000);
+      return;
+    }
+
+    radioPlayer.src = urls[index];
+    radioPlayer.load();
     
-    let isPlaying = false;
-    let retryCount = 0;
-    const maxRetries = 3;
+    // Delay de 1 segundo para carregar o buffer
+    setTimeout(() => {
+      radioPlayer.play()
+        .then(() => {
+          isPlaying = true;
+          playPauseIcon.className = 'fas fa-pause';
+          radioTooltip.textContent = 'Pausar Rádio';
+          radioBtn.classList.add('playing');
+          radioNowPlaying.classList.add('show');
+          retryCount = 0;
+        })
+        .catch(() => {
+          attempt(index + 1);
+        });
+    }, 1000);
+  }
 
-    const radioBtn = document.getElementById('radioBtn');
-    const playPauseIcon = document.getElementById('playPauseIcon');
-    const radioTooltip = document.getElementById('radioTooltip');
-    const radioNowPlaying = document.getElementById('radioNowPlaying');
+  attempt(0);
+}
 
-    // Função para tentar reproduzir com diferentes URLs
-    function tryPlayWithFallback() {
-      const urls = [
-        "https://corsproxy.io/?" + encodeURIComponent("http://streaming13.hstbr.net:8280/live"),
-        "https://api.allorigins.win/raw?url=" + encodeURIComponent("http://streaming13.hstbr.net:8280/live"),
-        "http://streaming13.hstbr.net:8280/live"
-      ];
-
-      function attempt(index) {
-        if (index >= urls.length) {
-          radioTooltip.textContent = 'Não foi possível conectar';
+// Verificar se o player está travando (stalled)
+radioPlayer.addEventListener('stalled', () => {
+  console.log('Rádio travou, recarregando...');
+  if (isPlaying) {
+    radioTooltip.textContent = 'Recarregando...';
+    
+    // Delay de 2 segundos antes de recarregar
+    setTimeout(() => {
+      radioPlayer.load();
+      radioPlayer.play()
+        .then(() => {
+          radioTooltip.textContent = 'Pausar Rádio';
+        })
+        .catch(() => {
+          radioTooltip.textContent = 'Erro ao recarregar';
           setTimeout(() => {
             radioTooltip.textContent = 'Ouvir Rádio';
           }, 2000);
-          return;
-        }
+        });
+    }, 2000);
+  }
+});
 
-        radioPlayer.src = urls[index];
-        radioPlayer.load();
-        
-        radioPlayer.play()
-          .then(() => {
-            isPlaying = true;
-            playPauseIcon.className = 'fas fa-pause';
-            radioTooltip.textContent = 'Pausar Rádio';
-            radioBtn.classList.add('playing');
-            radioNowPlaying.classList.add('show');
-            retryCount = 0;
-          })
-          .catch(() => {
-            attempt(index + 1);
-          });
-      }
+// Verificar se o buffer está vazio (waiting)
+radioPlayer.addEventListener('waiting', () => {
+  console.log('Aguardando buffer...');
+  if (isPlaying) {
+    radioTooltip.textContent = 'Carregando...';
+  }
+});
 
-      attempt(0);
-    }
+// Quando começar a tocar novamente
+radioPlayer.addEventListener('playing', () => {
+  if (isPlaying) {
+    radioTooltip.textContent = 'Pausar Rádio';
+  }
+});
 
-    function toggleRadio() {
-      if (isPlaying) {
-        radioPlayer.pause();
-        isPlaying = false;
-        playPauseIcon.className = 'fas fa-play';
-        radioTooltip.textContent = 'Ouvir Rádio';
-        radioBtn.classList.remove('playing');
-        radioNowPlaying.classList.remove('show');
-      } else {
-        radioTooltip.textContent = 'Conectando...';
-        tryPlayWithFallback();
-      }
-    }
+// Verificar se o player parou sem motivo
+radioPlayer.addEventListener('pause', () => {
+  // Se estava tocando e pausou sozinho, recarregar
+  if (isPlaying && radioPlayer.currentTime > 0) {
+    console.log('Rádio pausou sozinha, retomando...');
+    setTimeout(() => {
+      radioPlayer.play().catch(() => {});
+    }, 1000);
+  }
+});
+
+// Se o player terminar (não deveria acontecer com rádio)
+radioPlayer.addEventListener('ended', () => {
+  if (isPlaying) {
+    console.log('Rádio terminou, reiniciando...');
+    setTimeout(() => {
+      radioPlayer.load();
+      radioPlayer.play().catch(() => {});
+    }, 1000);
+  }
+});
+
+function toggleRadio() {
+  if (isPlaying) {
+    radioPlayer.pause();
+    isPlaying = false;
+    playPauseIcon.className = 'fas fa-play';
+    radioTooltip.textContent = 'Ouvir Rádio';
+    radioBtn.classList.remove('playing');
+    radioNowPlaying.classList.remove('show');
+  } else {
+    radioTooltip.textContent = 'Conectando...';
+    tryPlayWithFallback();
+  }
+}
 
     // Event listeners
     radioPlayer.addEventListener('error', (e) => {
@@ -913,7 +979,7 @@
     const modal = document.getElementById('modal');
     const modalImg = document.getElementById('modalImg');
     const modalCodigo = document.getElementById('modalCodigo');
-    const modalTitulo = document.getElementById('modalTitulo');
+   // const modalTitulo = document.getElementById('modalTitulo');
     const modalDescricao = document.getElementById('modalDescricao');
     const botaoModal = document.getElementById('botaoWhatsappModal');
     const fecharModal = document.getElementById('fecharModal');
@@ -978,7 +1044,7 @@
       if (src) {
         fotoAtual = src;
         modalImg.src = src;
-        modalTitulo.textContent = titulo;
+       // modalTitulo.textContent = titulo;
         modalDescricao.textContent = desc;
         modalCodigo.textContent = `DÔRA ${id.padStart(3,'0')} · EDIÇÃO LIMITADA`;
         modal.style.display = 'flex';
