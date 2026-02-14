@@ -711,32 +711,27 @@
       .radio-now-playing img { width: 30px; height: 30px; }
     }
 
-    /* Garantir que o modal seja clicável no celular */
-    .modal-botao {
+    .modal-botao, .card {
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
-    }
-
-    .card {
-      -webkit-tap-highlight-color: transparent;
     }
   </style>
 </head>
 <body>
   <!-- PLAYER DE RÁDIO -->
   <div class="radio-player">
-    <button class="radio-btn" id="radioBtn" onclick="toggleRadio()">
-      <div class="radio-icon" id="radioIcon">
+    <button class="radio-btn" id="radioBtn">
+      <div class="radio-icon">
         <i class="fas fa-play" id="playPauseIcon"></i>
       </div>
-      <span class="radio-tooltip" id="radioTooltip">Ouvir Rio FM</span>
+      <span class="radio-tooltip" id="radioTooltip">Ouvir Rádio</span>
     </button>
   </div>
 
   <!-- INFO DA RÁDIO -->
   <div class="radio-now-playing" id="radioNowPlaying">
-    <img src="https://img.radios.com.br/radio/lg/radio13416_1745327959.png" alt="Rio FM">
-    <span>Rio FM 102.3</span>
+    <img src="https://img.radios.com.br/radio/lg/radio13416_1745327959.png" alt="Rádio">
+    <span>Rádio ao vivo</span>
     <i class="fas fa-circle"></i>
   </div>
 
@@ -750,10 +745,11 @@
         </div>
         <div class="modal-info">
           <div class="modal-codigo" id="modalCodigo">PEÇA EXCLUSIVA</div>
+          <h2 class="modal-titulo" id="modalTitulo">Coleção Nômade</h2>
           <p class="modal-descricao" id="modalDescricao">
-            Peça artesanal feita à mão em Manaus. Cada bolsa é única e carrega a alma amazônica.
+            Peça artesanal feita à mão em Manaus.
           </p>
-          <button class="modal-botao" id="botaoWhatsappModal" onclick="reservarWhatsApp()">
+          <button class="modal-botao" id="botaoWhatsappModal">
             <i class="fab fa-whatsapp"></i>
             RESERVAR AGORA
           </button>
@@ -763,14 +759,12 @@
   </div>
 
   <main class="container">
-    <!-- HERO -->
     <div class="hero">
-      <img src="InShot_20260213_221607139.png" alt="Dôra Atelier" class="logo-selo" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'200\' viewBox=\'0 0 400 200\'%3E%3Crect width=\'400\' height=\'200\' fill=\'%23fcf8f3\'/%3E%3Ctext x=\'50\' y=\'130\' font-family=\'Playfair Display\' font-size=\'48\' fill=\'%232c2824\'%3EDÔRA%3C/text%3E%3C/svg%3E';">
+      <img src="InShot_20260213_221607139.png" alt="Dôra Atelier" class="logo-selo">
       <h1>DÔRA <span>atelier</span></h1>
       <div class="hero-local">MANAUS · AMAZONAS</div>
     </div>
 
-    <!-- FILTROS -->
     <div class="filtros">
       <div class="contador"><strong id="contador">0</strong> peças disponíveis</div>
       <div class="botoes-ordem">
@@ -779,17 +773,14 @@
       </div>
     </div>
 
-    <!-- GRID -->
     <div class="grid" id="grid"></div>
 
-    <!-- RODAPÉ -->
     <div class="footer">
       <p>© Dôra Atelier · bolsas e bordados em Manaus</p>
       <p style="margin-top: 25px;"><a href="https://instagram.com/dora.atelier" target="_blank">@dora.atelier</a> · +55 92 9205-5895</p>
     </div>
   </main>
 
-  <!-- WHATSAPP FIXO -->
   <div class="whatsapp-float">
     <a href="https://wa.me/559292055895?text=Olá%20Dôra%20Atelier!%20Vi%20sua%20coleção%20e%20me%20interessei." target="_blank">
       <i class="fab fa-whatsapp"></i>
@@ -797,59 +788,92 @@
   </div>
 
   <script>
-    // ===== PLAYER DE RÁDIO =====
+    // ===== PLAYER DE RÁDIO CORRIGIDO =====
     const radioUrl = "http://streaming13.hstbr.net:8280/live";
     const radioPlayer = new Audio(radioUrl);
     radioPlayer.preload = 'none';
     
     let isPlaying = false;
-    
+    let reconnectTimer = null;
+
     const radioBtn = document.getElementById('radioBtn');
     const playPauseIcon = document.getElementById('playPauseIcon');
     const radioTooltip = document.getElementById('radioTooltip');
     const radioNowPlaying = document.getElementById('radioNowPlaying');
 
-    function toggleRadio() {
+    // Configurar eventos de erro e reconexão
+    radioPlayer.addEventListener('error', function(e) {
+      console.log('Erro na rádio, tentando reconectar...');
       if (isPlaying) {
-        radioPlayer.pause();
-        isPlaying = false;
-        playPauseIcon.className = 'fas fa-play';
-        radioTooltip.textContent = 'Ouvir Rio FM';
-        radioBtn.classList.remove('playing');
-        radioNowPlaying.classList.remove('show');
-      } else {
-        radioPlayer.play()
-          .then(() => {
-            isPlaying = true;
-            playPauseIcon.className = 'fas fa-pause';
-            radioTooltip.textContent = 'Pausar Rio FM';
-            radioBtn.classList.add('playing');
-            radioNowPlaying.classList.add('show');
-          })
-          .catch(error => {
-            console.log('Erro ao reproduzir rádio:', error);
-            alert('Clique novamente para ouvir a Rio FM');
-            // Tenta novamente com interação do usuário
-            radioPlayer.play().catch(e => console.log('Falha na segunda tentativa'));
-          });
+        setTimeout(() => {
+          radioPlayer.load();
+          radioPlayer.play().catch(e => console.log('Falha na reconexão'));
+        }, 2000);
       }
-    }
+    });
+
+    radioPlayer.addEventListener('stalled', function() {
+      if (isPlaying) {
+        radioPlayer.load();
+        radioPlayer.play().catch(e => console.log('Reconectando...'));
+      }
+    });
+
+    radioPlayer.addEventListener('playing', () => {
+      isPlaying = true;
+      playPauseIcon.className = 'fas fa-pause';
+      radioTooltip.textContent = 'Pausar Rádio';
+      radioBtn.classList.add('playing');
+      radioNowPlaying.classList.add('show');
+    });
+
+    radioPlayer.addEventListener('pause', () => {
+      isPlaying = false;
+      playPauseIcon.className = 'fas fa-play';
+      radioTooltip.textContent = 'Ouvir Rádio';
+      radioBtn.classList.remove('playing');
+      radioNowPlaying.classList.remove('show');
+    });
 
     radioPlayer.addEventListener('ended', () => {
       isPlaying = false;
       playPauseIcon.className = 'fas fa-play';
-      radioTooltip.textContent = 'Ouvir Rio FM';
+      radioTooltip.textContent = 'Ouvir Rádio';
       radioBtn.classList.remove('playing');
       radioNowPlaying.classList.remove('show');
     });
 
-    radioPlayer.addEventListener('error', () => {
-      isPlaying = false;
-      playPauseIcon.className = 'fas fa-play';
-      radioTooltip.textContent = 'Ouvir Rio FM';
-      radioBtn.classList.remove('playing');
-      radioNowPlaying.classList.remove('show');
-    });
+    // Função toggle melhorada
+    function toggleRadio() {
+      if (isPlaying) {
+        radioPlayer.pause();
+      } else {
+        // Limpa qualquer timer anterior
+        if (reconnectTimer) {
+          clearTimeout(reconnectTimer);
+          reconnectTimer = null;
+        }
+        
+        radioPlayer.load();
+        radioPlayer.play()
+          .then(() => {
+            console.log('Rádio tocando');
+          })
+          .catch(error => {
+            console.log('Erro ao reproduzir rádio:', error);
+            radioTooltip.textContent = 'Tente novamente';
+            
+            // Tenta novamente após 1 segundo
+            reconnectTimer = setTimeout(() => {
+              radioPlayer.load();
+              radioPlayer.play().catch(e => console.log('Segunda tentativa falhou'));
+            }, 1000);
+          });
+      }
+    }
+
+    // Adicionar evento de clique ao botão
+    radioBtn.addEventListener('click', toggleRadio);
 
     // ===== CATÁLOGO =====
     const TOTAL_IMAGENS = 114;
@@ -859,16 +883,16 @@
       "Bolsa confeccionada artesanalmente com técnicas tradicionais amazônicas.",
       "Artesanato puro: cada detalhe é feito à mão no atelier Dôra.",
       "Design autoral que une tradição amazônica e contemporaneidade.",
-      "Peça única com personalidade e acabamento primoroso em cada detalhe.",
-      "Artesania que transcende: bolsa feita inteiramente à mão com amor.",
+      "Peça única com personalidade e acabamento primoroso.",
+      "Artesania que transcende: bolsa feita inteiramente à mão.",
       "Exclusividade em cada ponto, em cada costura artesanal.",
       "A alma amazônica presente em cada curva e cada textura.",
       "Feita à mão com materiais selecionados e muito cuidado artesanal.",
       "Artesanato de luxo: peça única com assinatura Dôra Atelier.",
-      "Criação exclusiva que carrega a identidade amazônica em cada detalhe.",
+      "Criação exclusiva que carrega a identidade amazônica.",
       "Técnicas manuais tradicionais aplicadas ao design contemporâneo.",
-      "Peça de coleção: artesania pura em cada ponto e acabamento.",
-      "O equilíbrio perfeito entre o rústico e o sofisticado, feito à mão."
+      "Peça de coleção: artesania pura em cada ponto.",
+      "O equilíbrio perfeito entre o rústico e o sofisticado."
     ];
 
     function gerarCatalogo() {
@@ -896,7 +920,7 @@
     const modal = document.getElementById('modal');
     const modalImg = document.getElementById('modalImg');
     const modalCodigo = document.getElementById('modalCodigo');
-   // const modalTitulo = document.getElementById('modalTitulo');
+    const modalTitulo = document.getElementById('modalTitulo');
     const modalDescricao = document.getElementById('modalDescricao');
     const botaoModal = document.getElementById('botaoWhatsappModal');
     const fecharModal = document.getElementById('fecharModal');
@@ -948,7 +972,7 @@
     btnAleatorio.addEventListener('click', ordenarAleatorio);
     ordenarNormal();
 
-    // Evento para abrir modal ao clicar no card
+    // Modal
     grid.addEventListener('click', (e) => {
       const card = e.target.closest('.card');
       if (!card) return;
@@ -961,14 +985,13 @@
       if (src) {
         fotoAtual = src;
         modalImg.src = src;
-        //modalTitulo.textContent = titulo;
+        modalTitulo.textContent = titulo;
         modalDescricao.textContent = desc;
         modalCodigo.textContent = `DÔRA ${id.padStart(3,'0')} · EDIÇÃO LIMITADA`;
         modal.style.display = 'flex';
       }
     });
 
-    // Função para reservar no WhatsApp
     window.reservarWhatsApp = function() {
       if (fotoAtual) {
         const msg = `Olá Dôra! Me interessei por esta peça (https://atelierdora.onrender.com/${fotoAtual}) da sua coleção. Gostaria de mais informações.`;
@@ -976,15 +999,12 @@
       }
     };
 
-    // Função para fechar modal
     window.closeModal = function() {
       modal.style.display = 'none';
     };
 
-    // Fechar com botão X
     fecharModal.addEventListener('click', closeModal);
 
-    // Fechar com ESC
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && modal.style.display === 'flex') {
         closeModal();
